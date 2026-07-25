@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Local database + secrets
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.example
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# NOTE: model weights in backend/app/models/*.pth ARE committed on purpose
+# (~2 MB total) so the deployed backend runs the real trained models.

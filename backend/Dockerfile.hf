@@ -1,0 +1,28 @@
+# Hugging Face Spaces (Docker SDK) image for the NeuralSched backend.
+# HF Spaces serves the app on port 7860 and runs as a non-root user (uid 1000).
+FROM python:3.11-slim
+
+# System deps for psycopg2 / bcrypt / scientific wheels.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Non-root user required by HF Spaces.
+RUN useradd -m -u 1000 appuser
+USER appuser
+ENV HOME=/home/appuser
+ENV PATH="$HOME/.local/bin:$PATH"
+WORKDIR $HOME/app
+
+# Install CPU-only torch first (from the PyTorch CPU index), then the rest.
+COPY --chown=appuser requirements.txt .
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu \
+    -r requirements.txt
+
+COPY --chown=appuser . .
+
+# HF Spaces provides PORT=7860. Bind to it (fall back to 7860 locally).
+ENV PORT=7860
+EXPOSE 7860
+
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}"]

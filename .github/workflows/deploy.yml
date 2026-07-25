@@ -1,0 +1,39 @@
+name: deploy
+
+# Auto-deploy on push to main.
+# - Frontend: build + deploy to Cloudflare Pages (or swap for Vercel).
+# - Backend: trigger a Render deploy via deploy hook.
+# Set repo secrets: CF_API_TOKEN, CF_ACCOUNT_ID, RENDER_DEPLOY_HOOK.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+      - name: Deploy to Cloudflare Pages
+        if: ${{ secrets.CF_API_TOKEN != '' }}
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: neuralsched
+          directory: frontend/dist
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"

@@ -1,0 +1,8 @@
+# Treat the trained weights as binary so Git never tries to diff/merge them.
+*.pth binary
+*.pt binary
+*.pdf binary
+
+# Normalize line endings for text so Windows/Linux collaborators don't churn diffs.
+* text=auto eol=lf
+*.ps1 text eol=crlf

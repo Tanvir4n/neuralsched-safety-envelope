@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Safety Envelope &amp; Shadow Test — ShadowForge</title>
+<style>
+  :root{
+    --bg:#0A0B14; --surface:#151826; --surfaceAlt:#10121E;
+    --border:rgba(148,163,184,.14); --text:#A5B0C2; --strong:#F1F5F9; --dim:#6B7688;
+    --indigo:#7C83FF; --green:#34D399; --amber:#FBBF24; --red:#F43F5E; --teal:#22D3EE;
+    --violet:#A855F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',system-ui,Segoe UI,Roboto,sans-serif;
+    overflow:hidden;
+  }
+  .mono{font-family:'JetBrains Mono','Fira Code',ui-monospace,monospace}
+  .deck{height:100vh;width:100vw;position:relative}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    justify-content:center;padding:6vh 8vw;
+    animation:fade .4s ease;
+  }
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  h1{font-size:clamp(30px,5vw,58px);color:var(--strong);line-height:1.08;font-weight:800}
+  h2{font-size:clamp(22px,3.4vw,40px);color:var(--strong);font-weight:800;margin-bottom:22px;display:flex;align-items:center;gap:16px}
+  h2 .bar{width:6px;height:1em;border-radius:4px;background:var(--indigo)}
+  .sub{font-size:clamp(15px,1.8vw,21px);margin-top:18px;max-width:60ch}
+  .tag{
+    display:inline-block;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--indigo);border:1px solid color-mix(in srgb,var(--indigo) 40%,transparent);
+    background:color-mix(in srgb,var(--indigo) 12%,transparent);
+    padding:6px 14px;border-radius:999px;margin-bottom:26px;width:max-content
+  }
+  ul{list-style:none;display:grid;gap:14px;margin-top:10px}
+  li{
+    font-size:clamp(15px,1.9vw,22px);display:flex;gap:14px;align-items:flex-start;
+    background:var(--surfaceAlt);border:1px solid var(--border);border-radius:12px;padding:16px 18px
+  }
+  li b{color:var(--strong)}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:.5em;flex:none}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:10px}
+  .card{background:var(--surfaceAlt);border:1px solid var(--border);border-radius:16px;padding:24px}
+  .card h3{color:var(--strong);font-size:clamp(16px,2vw,24px);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:999px;width:max-content}
+  .nums{display:flex;gap:22px;margin-top:10px}
+  .num .v{font-size:clamp(24px,4vw,44px);font-weight:800}
+  .num .l{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)}
+  .flow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;font-size:clamp(13px,1.6vw,19px)}
+  .flow .box{background:var(--surfaceAlt);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--strong)}
+  .flow .arr{color:var(--indigo);font-size:1.6em}
+  .quote{
+    font-size:clamp(20px,3.2vw,40px);color:var(--strong);font-weight:700;line-height:1.3;
+    border-left:5px solid var(--indigo);padding-left:26px;max-width:24ch
+  }
+  .foot{position:absolute;bottom:3.5vh;left:8vw;right:8vw;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--dim)}
+  .prog{position:absolute;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--indigo),var(--teal));transition:width .3s}
+  .brand{background:linear-gradient(90deg,var(--indigo),var(--violet),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hint{position:fixed;bottom:12px;right:16px;font-size:12px;color:var(--dim);opacity:.7}
+  .center{align-items:center;text-align:center}
+  .center .sub{margin-left:auto;margin-right:auto}
+  code{background:var(--surface);padding:2px 7px;border-radius:6px;color:var(--teal);font-size:.88em}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:10px 20px;font-size:clamp(14px,1.7vw,20px);margin-top:8px}
+  .kv b{color:var(--strong)}
+</style>
+</head>
+<body>
+<div class="prog" id="prog"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 TITLE -->
+  <section class="slide active center">
+    <span class="tag">NeuralSched · Additional Challenge</span>
+    <h1 class="brand">Safety Envelope<br/>&amp; Shadow Test</h1>
+    <p class="sub">Making a new AI GPU scheduler <b>prove itself before it controls real jobs.</b></p>
+    <p class="sub mono" style="color:var(--dim);margin-top:34px">Team ShadowForge · Daffodil International University</p>
+  </section>
+
+  <!-- 2 PROBLEM -->
+  <section class="slide">
+    <h2><span class="bar"></span>The problem</h2>
+    <p class="sub" style="margin-top:0">SmartPack (GNN + PPO) is a powerful new scheduler — but unproven. Letting it place real jobs on day one is a risk. The challenge: wrap it in a safety layer.</p>
+    <ul>
+      <li><span class="dot" style="background:var(--green)"></span><div><b>Safety Envelope</b> — hard limits it may never break: max node temperature &amp; max job wait. Breaking actions are rejected.</div></li>
+      <li><span class="dot" style="background:var(--teal)"></span><div><b>Shadow Test</b> — run it beside FIFO on the same jobs, compare completion &amp; failures — <b>without applying its choice.</b></div></li>
+      <li><span class="dot" style="background:var(--red)"></span><div><b>Blocked Log</b> — every rejected action in one sentence naming the limit it broke.</div></li>
+    </ul>
+  </section>
+
+  <!-- 3 KEY IDEA -->
+  <section class="slide center">
+    <span class="tag">The core design choice</span>
+    <p class="quote">"SmartPack runs in shadow mode. It must prove itself before it controls real jobs."</p>
+    <div class="kv" style="margin-top:40px;text-align:left">
+      <b style="color:var(--teal)">FIFO</b><span>is the <b>only</b> executor — it places every real job, no exceptions.</span>
+      <b style="color:var(--indigo)">SmartPack</b><span>is <b>observed, never obeyed</b> — its choice is scored, then thrown away.</span>
+    </div>
+  </section>
+
+  <!-- 4 FLOW -->
+  <section class="slide">
+    <h2><span class="bar"></span>How one job flows</h2>
+    <div class="flow">
+      <span class="box">Job arrives<br/><small style="color:var(--dim)">real or simulated</small></span>
+      <span class="arr">→</span>
+      <span class="box" style="border-color:var(--indigo)">SmartPack<br/><small style="color:var(--dim)">hypothetical</small></span>
+      <span class="arr">→</span>
+      <span class="box" style="border-color:var(--green)">Envelope check<br/><small style="color:var(--dim)">temp? wait?</small></span>
+      <span class="arr">→</span>
+      <span class="box" style="border-color:var(--red)">Blocked log<br/><small style="color:var(--dim)">if it breaks a limit</small></span>
+    </div>
+    <div class="flow" style="margin-top:24px">
+      <span class="box" style="border-color:var(--teal)">FIFO places the <b>real</b> job &nbsp;→&nbsp; cluster actually runs it</span>
+    </div>
+    <p class="sub">The agent's path never touches the cluster. Only FIFO's path does.</p>
+  </section>
+
+  <!-- 5 SCOREBOARD -->
+  <section class="slide">
+    <h2><span class="bar"></span>The shadow scoreboard</h2>
+    <div class="grid2">
+      <div class="card" style="border-color:color-mix(in srgb,var(--indigo) 40%,transparent)">
+        <h3>SmartPack <span class="chip" style="color:var(--indigo);background:color-mix(in srgb,var(--indigo) 14%,transparent)">observed only</span></h3>
+        <div class="nums">
+          <div class="num"><div class="v" style="color:var(--green)">✓</div><div class="l">completions</div></div>
+          <div class="num"><div class="v" style="color:var(--amber)">⛔</div><div class="l">blocked</div></div>
+          <div class="num"><div class="v" style="color:var(--red)">✕</div><div class="l">failures</div></div>
+        </div>
+        <p style="margin-top:16px;font-size:15px">Three numbers. A <b style="color:var(--amber)">blocked</b> action is a <b>caught risk</b>, not a failure.</p>
+      </div>
+      <div class="card" style="border-color:color-mix(in srgb,var(--teal) 40%,transparent)">
+        <h3>FIFO <span class="chip" style="color:var(--teal);background:color-mix(in srgb,var(--teal) 14%,transparent)">real executor</span></h3>
+        <div class="nums">
+          <div class="num"><div class="v" style="color:var(--green)">✓</div><div class="l">completions</div></div>
+          <div class="num"><div class="v" style="color:var(--red)">✕</div><div class="l">failures</div></div>
+        </div>
+        <p style="margin-top:16px;font-size:15px">Two numbers. No "blocked" — FIFO is the baseline that actually runs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 LIVE + HONESTY -->
+  <section class="slide">
+    <h2><span class="bar"></span>Live, visible &amp; honest</h2>
+    <ul>
+      <li><span class="dot" style="background:var(--indigo)"></span><div><b>Live-adjustable limits</b> — drag a slider to tighten a rule and watch blocks climb in real time.</div></li>
+      <li><span class="dot" style="background:var(--amber)"></span><div><b>"Force a block" button</b> — guarantees a rejection on demand for the demo.</div></li>
+      <li><span class="dot" style="background:var(--teal)"></span><div><b>Real + synthetic jobs</b> feed the test; every synthetic job is flagged <code>simulated</code> so nothing is faked as real load.</div></li>
+      <li><span class="dot" style="background:var(--green)"></span><div>All of it shown on a dedicated <b>Safety</b> dashboard page — nothing hidden in the background.</div></li>
+    </ul>
+  </section>
+
+  <!-- 7 DEMO -->
+  <section class="slide">
+    <h2><span class="bar"></span>Demo — verify it in 5 steps</h2>
+    <ul>
+      <li><span class="dot" style="background:var(--indigo)"></span><div><b>1.</b> Open the Safety page — two scoreboards; only the agent has a "Blocked" count.</div></li>
+      <li><span class="dot" style="background:var(--indigo)"></span><div><b>2.</b> Submit a real job → response reads <i>"Placed by FIFO (agent ran in shadow)."</i></div></li>
+      <li><span class="dot" style="background:var(--amber)"></span><div><b>3.</b> Click <b>Force a block</b> → a red one-sentence entry appears in the log.</div></li>
+      <li><span class="dot" style="background:var(--red)"></span><div><b>4.</b> Drag the temperature slider down → blocked count rises live.</div></li>
+      <li><span class="dot" style="background:var(--green)"></span><div><b>5.</b> Scroll the Blocked Log — each line names the exact limit broken.</div></li>
+    </ul>
+    <p class="sub mono" style="color:var(--green)">Scripted end-to-end run: 16 / 16 checks passing against the live API.</p>
+  </section>
+
+  <!-- 8 CLOSE -->
+  <section class="slide center">
+    <span class="tag">Deliverables</span>
+    <h1 style="font-size:clamp(26px,4vw,46px)">Live run · Source · Design note · Slides</h1>
+    <p class="sub">Extends the Phase-1 <b>SmartPack vs FIFO</b> widget with a real safety cage and an honest "never applied" guarantee.</p>
+    <p class="sub mono brand" style="margin-top:30px;font-size:22px">Prove it before you trust it.</p>
+  </section>
+
+</div>
+
+<div class="hint">← → or Space to navigate · F for fullscreen · P to print/PDF</div>
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const prog=document.getElementById('prog');
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    prog.style.width=((i+1)/slides.length*100)+'%';
+  }
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){show(i+1);e.preventDefault();}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){show(i-1);e.preventDefault();}
+    else if(e.key==='Home'){show(0);}
+    else if(e.key==='End'){show(slides.length-1);}
+    else if(e.key.toLowerCase()==='f'){document.documentElement.requestFullscreen?.();}
+    else if(e.key.toLowerCase()==='p'){window.print();}
+  });
+  document.getElementById('deck').addEventListener('click',()=>show(i+1));
+  show(0);
+</script>
+</body>
+</html>

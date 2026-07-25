@@ -1,0 +1,234 @@
+:root {
+  --bg: #0a0b14;
+  --surface: #151826;
+  --surface-alt: #10121e;
+  --border: rgba(148, 163, 184, 0.12);
+  --primary: #7c83ff;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --red: #f43f5e;
+  --text-strong: #f1f5f9;
+  --text: #a5b0c2;
+  --text-dim: #6b7688;
+  --font-ui: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* Light mode overrides (secondary theme, toggle in navbar). */
+[data-theme="light"] {
+  --bg: #f4f5fb;
+  --surface: #ffffff;
+  --surface-alt: #f8f9ff;
+  --border: rgba(30, 27, 75, 0.1);
+  --text-strong: #1e1b4b;
+  --text: #4b5169;
+  --text-dim: #8b93a7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(
+      circle at 15% 10%,
+      rgba(124, 131, 255, 0.08),
+      transparent 42%
+    ),
+    radial-gradient(circle at 85% 90%, rgba(168, 85, 247, 0.06), transparent 42%),
+    radial-gradient(circle at 60% 40%, rgba(34, 211, 238, 0.04), transparent 50%);
+  background-attachment: fixed;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glassmorphism card */
+.glass {
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass:hover {
+  border-color: rgba(124, 131, 255, 0.3);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: var(--font-ui);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+}
+
+.badge-sim {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  text-transform: uppercase;
+}
+
+@keyframes pulse-alert {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+}
+
+.alert-pulse {
+  animation: pulse-alert 1.6s infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Animated + textured backgrounds (moving elements + subtle grid texture).
+   Used behind the homepage hero and app shell. Kept low-contrast so numeric
+   data stays readable. Respects prefers-reduced-motion.
+--------------------------------------------------------------------------- */
+
+/* Fixed ambient layer applied to the whole app via body::before. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(124, 131, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 131, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+
+[data-theme="light"] body::before,
+body[data-theme="light"]::before {
+  background-image:
+    linear-gradient(rgba(30, 27, 75, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 27, 75, 0.05) 1px, transparent 1px);
+}
+
+/* Reusable animated aurora background container. */
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+.aurora-bg .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  will-change: transform;
+}
+.aurora-bg .b1 {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(124, 131, 255, 0.55), transparent 60%);
+  top: -120px; left: -80px;
+  animation: drift1 22s ease-in-out infinite;
+}
+.aurora-bg .b2 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.5), transparent 60%);
+  bottom: -140px; right: -60px;
+  animation: drift2 26s ease-in-out infinite;
+}
+.aurora-bg .b3 {
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.42), transparent 60%);
+  top: 30%; left: 55%;
+  animation: drift3 30s ease-in-out infinite;
+}
+
+@keyframes drift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(120px, 80px) scale(1.15); }
+}
+@keyframes drift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-100px, -60px) scale(1.1); }
+}
+@keyframes drift3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-80px, 90px) scale(0.9); }
+}
+
+/* Moving conic sheen for hero headings / feature cards. */
+@keyframes sheen {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.brand-animate {
+  background: linear-gradient(90deg, #7c83ff, #a855f7, #22d3ee, #7c83ff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: sheen 8s linear infinite;
+}
+
+/* Gradient hairline border used on premium cards. */
+.glow-border {
+  position: relative;
+}
+.glow-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(124, 131, 255, 0.5), rgba(168, 85, 247, 0.35), transparent 60%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-bg .blob,
+  .brand-animate { animation: none; }
+}
+
